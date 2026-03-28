@@ -39,6 +39,13 @@
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
     initContent = ''
+      # Commit Alias
+      function NixCommit() {
+        cd ~/dots
+        git add .
+        git commit -m "$1"
+      }
+
       function precmd() {
         echo -ne '\e[4 q'
       }
@@ -59,6 +66,7 @@
       Flake = "nvim ~/dots/flake.nix";
       Update = "cd ~/dots && sudo nix flake update && sudo nixos-rebuild switch --flake ~/dots#NixDesktop";
       Clean = "sudo nix-collect-garbage -d";
+      NixPush = "cd ~/dots && git push -u origin main";
       ls = "lsd";
     };
   };
