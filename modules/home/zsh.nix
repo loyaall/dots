@@ -57,7 +57,7 @@
       Home = "nvim ~/dots/system/home.nix";
       Packages = "nvim ~/dots/modules/home/packages.nix";
       Flake = "nvim ~/dots/flake.nix";
-      Update = "cd ~/dots && sudo nix flake update";
+      Update = "cd ~/dots && sudo nix flake update && sudo nixos-rebuild switch --flake ~/dots#NixDesktop";
       Clean = "sudo nix-collect-garbage -d";
       ls = "lsd";
     };
