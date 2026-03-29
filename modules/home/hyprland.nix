@@ -12,7 +12,7 @@
 
       monitorv2 = [
         {
-          output = "DP-3";
+          output = "DP-1";
           mode = "1920x1080@200";
           position = "0x0";
           scale = 1;
@@ -28,7 +28,7 @@
       ];
 
       workspace = [
-        "1, monitor:DP-3, default:true"
+        "1, monitor:DP-1, default:true"
         "2, monitor:HDMI-A-1, default:true"
       ];
 

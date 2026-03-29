@@ -7,7 +7,7 @@
 {
   programs.evie-greeter = {
     enable = true;
-    primaryMonitor = "DP-3";
+    primaryMonitor = "DP-1";
   };
 
   services.greetd = {

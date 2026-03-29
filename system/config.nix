@@ -44,7 +44,47 @@
   ];
 
   # Support for shared system libraries
-  programs.nix-ld.enable = true;
+  programs.nix-ld = {
+    enable = true;
+    libraries = with pkgs; [
+      util-linux
+      libatomic_ops
+      fontconfig
+      freetype
+      stdenv.cc.cc
+      glib
+      nspr
+      nss
+      dbus
+      atk
+      at-spi2-atk
+      cups
+      libX11
+      libXcomposite
+      libXdamage
+      libXext
+      libXfixes
+      libXrandr
+      mesa
+      libgbm
+      expat
+      libxcb
+      libxkbcommon
+      cairo
+      pango
+      systemd
+      alsa-lib
+      at-spi2-core
+      vulkan-loader
+      vulkan-validation-layers
+      nvidia-vaapi-driver
+      libGL
+      curl
+      openssl
+      libwebsockets
+      cacert
+    ];
+  };
 
   # XDG Desktop Portal GTK
   xdg.portal = {

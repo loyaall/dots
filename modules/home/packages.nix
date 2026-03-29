@@ -21,7 +21,6 @@
     tldr
     xdg-utils
     btop
-    neovim
     wofi
     nautilus
     gnome-disk-utility

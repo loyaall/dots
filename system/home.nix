@@ -11,7 +11,6 @@
     inputs.zen-browser.homeManagerModules.default
     inputs.evie.homeManagerModules.evie
     inputs.eviefetch.homeManagerModules.eviefetch
-    inputs.nvf.homeManagerModules.default
     ../modules/home/hyprland.nix
     ../modules/home/packages.nix
     ../modules/home/zsh.nix
