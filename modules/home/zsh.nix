@@ -55,6 +55,16 @@
       zstyle ':completion:*' menu select
 
       export XDG_DATA_DIRS="${"\${XDG_DATA_DIRS:+$XDG_DATA_DIRS:}"}/var/lib/flatpak/exports/share:$HOME/.local/share/flatpak/exports/share"
+
+      # Key Bindings
+      bindkey '^A' beginning-of-line # go to the beginning of the line
+      bindkey '^D' delete-char # delete right char
+
+      bindkey "^[[1;5C" forward-word       # ctrl + arrow right go to the next word 
+      bindkey "^[[1;5D" backward-word      # ctrl + arrow left go to the previous word
+
+      bindkey '^H' backward-kill-word      # ctrl + backspace delete entire word 
+      bindkey '^[[3;5~' kill-word          # ctrl + canc delete entire word
     '';
 
     shellAliases = {

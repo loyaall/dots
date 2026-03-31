@@ -40,7 +40,6 @@
           lua
         ]
       ))
-      nvim-treesitter-context
       telescope-nvim
       plenary-nvim
       neo-tree-nvim
@@ -49,12 +48,17 @@
       lualine-nvim
       crates-nvim
       cord-nvim
-      which-key-nvim # Il popup per le shortcut
+      which-key-nvim
       trouble-nvim
       nvim-surround
-      nvim-notify # Le notifiche belle
+      nvim-notify
       nvim-dap
       nvim-dap-ui
+      conform-nvim
+      nvim-autopairs
+      gitsigns-nvim
+      todo-comments-nvim
+      toggleterm-nvim
     ];
 
     initLua = ''
@@ -71,6 +75,8 @@
       vim.opt.termguicolors = true
       vim.opt.wrap = true
       vim.opt.linebreak = true
+      vim.opt.scrolloff = 8
+      vim.opt.updatetime = 250
 
       -- --- NOTIFICHE BELLE (nvim-notify) ---
       local notify = require("notify")
@@ -106,11 +112,9 @@
       map("n", "<Down>", "gj", "Move down")
       map("n", "<Up>", "gk", "Move up")
 
-      -- --- WHICH-KEY (Il Popup Carino) ---
+      -- --- WHICH-KEY ---
       local wk = require("which-key")
       wk.setup({ delay = 0 })
-
-      -- Ctrl+K ora apre il popup di Which-Key per farti vedere tutto!
       map("n", "<C-k>", "<cmd>WhichKey<cr>", "Show Keybinds Popup")
 
       -- LSP Keybinds
@@ -120,10 +124,87 @@
       map("n", "[d", vim.diagnostic.goto_prev, "Prev Diagnostic")
       map("n", "]d", vim.diagnostic.goto_next, "Next Diagnostic")
 
-      -- --- UNIVERSAL FORMAT ON SAVE ---
-      vim.api.nvim_create_autocmd("BufWritePre", {
-        pattern = { "*.nix", "*.rs" },
-        callback = function() vim.lsp.buf.format({ async = false }) end,
+      -- Trouble
+      map("n", "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", "Diagnostics")
+      map("n", "<leader>xb", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", "Buffer Diagnostics")
+
+      -- DAP
+      map("n", "<leader>db", function() require('dap').toggle_breakpoint() end, "Toggle Breakpoint")
+      map("n", "<leader>dc", function() require('dap').continue() end, "Continue")
+      map("n", "<leader>ds", function() require('dap').step_over() end, "Step Over")
+      map("n", "<leader>di", function() require('dap').step_into() end, "Step Into")
+      map("n", "<leader>du", function() require('dapui').toggle() end, "Toggle DAP UI")
+
+      -- --- TERMINALE (toggleterm) ---
+      require("toggleterm").setup({
+        size = 15,
+        open_mapping = [[<C-j>]],
+        direction = "horizontal",
+        shade_terminals = true,
+        start_insert = true,
+        persist_size = true,
+      })
+
+      -- In modalità terminale, Ctrl+J per chiudere/nascondere
+      vim.keymap.set("t", "<C-j>", [[<C-\><C-n><cmd>ToggleTerm<CR>]], { silent = true, desc = "Toggle terminal" })
+
+      -- --- CONFORM (Format on Save) ---
+      require("conform").setup({
+        formatters_by_ft = {
+          nix  = { "nixfmt" },
+          rust = { "rustfmt" },
+          sh   = { "shfmt" },
+        },
+        format_on_save = {
+          timeout_ms = 2000,
+          lsp_fallback = true,
+        },
+      })
+
+      -- --- AUTOPAIRS ---
+      require("nvim-autopairs").setup({
+        check_ts = true, -- usa treesitter per contesto
+      })
+      -- Integrazione con cmp
+      local cmp_autopairs = require("nvim-autopairs.completion.cmp")
+      local cmp = require("cmp")
+      cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
+
+      -- --- GITSIGNS ---
+      require("gitsigns").setup({
+        signs = {
+          add          = { text = "▎" },
+          change       = { text = "▎" },
+          delete       = { text = "" },
+          topdelete    = { text = "" },
+          changedelete = { text = "▎" },
+        },
+        on_attach = function(bufnr)
+          local gs = package.loaded.gitsigns
+          local bmap = function(mode, l, r, desc)
+            vim.keymap.set(mode, l, r, { buffer = bufnr, silent = true, desc = desc })
+          end
+          bmap("n", "]c", gs.next_hunk, "Next Hunk")
+          bmap("n", "[c", gs.prev_hunk, "Prev Hunk")
+          bmap("n", "<leader>hs", gs.stage_hunk, "Stage Hunk")
+          bmap("n", "<leader>hr", gs.reset_hunk, "Reset Hunk")
+          bmap("n", "<leader>hp", gs.preview_hunk, "Preview Hunk")
+          bmap("n", "<leader>hb", gs.blame_line, "Blame Line")
+        end,
+      })
+
+      -- --- TODO COMMENTS ---
+      require("todo-comments").setup()
+      map("n", "<leader>td", "<cmd>TodoTelescope<cr>", "Find TODOs")
+
+      -- --- CRATES ---
+      require("crates").setup({
+        lsp = {
+          enabled = true,
+          actions = true,
+          completion = true,
+          hover = true,
+        },
       })
 
       -- --- DASHBOARD (ALPHA) ---
@@ -148,7 +229,7 @@
       }
       alpha.setup(dashboard.config)
 
-      -- --- LSP SETUP (Nuovo Standard) ---
+      -- --- LSP SETUP ---
       local caps = require('cmp_nvim_lsp').default_capabilities()
       vim.lsp.config('nixd', {
         capabilities = caps,
@@ -160,7 +241,6 @@
       vim.lsp.enable({ 'nixd', 'rust_analyzer', 'bashls', 'yamlls' })
 
       -- --- COMPLETION ---
-      local cmp = require('cmp')
       cmp.setup({
         snippet = { expand = function(args) require('luasnip').lsp_expand(args.body) end },
         mapping = cmp.mapping.preset.insert({
@@ -170,7 +250,7 @@
             if cmp.visible() then cmp.select_next_item() else fallback() end
           end, { "i", "s" }),
         }),
-        sources = cmp.config.sources({{ name = 'nvim_lsp' }, { name = 'luasnip' }}, {{ name = 'buffer' }})
+        sources = cmp.config.sources({{ name = 'nvim_lsp' }, { name = 'luasnip' }, { name = 'crates' }}, {{ name = 'buffer' }})
       })
 
       -- --- ALTRI PLUGIN ---
@@ -178,11 +258,22 @@
       require('neo-tree').setup({ filesystem = { follow_current_file = { enabled = true } } })
       require('telescope').setup()
       require('cord').setup({})
+      require('nvim-surround').setup()
+      require('trouble').setup()
 
-      -- Treesitter
+      -- DAP UI
+      require('dapui').setup()
+      local dap = require('dap')
+      dap.listeners.after.event_initialized['dapui_config'] = function() require('dapui').open() end
+      dap.listeners.before.event_terminated['dapui_config'] = function() require('dapui').close() end
+
+      -- Treesitter: su NixOS i parser sono precompilati via nix,
+      -- non serve setup(). Abilitiamo highlight manualmente per FileType.
       vim.api.nvim_create_autocmd("FileType", {
-        pattern = { "rust", "nix", "bash", "lua" },
-        callback = function() vim.treesitter.start() end,
+        pattern = { "rust", "nix", "bash", "lua", "yaml", "toml", "json" },
+        callback = function()
+          pcall(vim.treesitter.start)
+        end,
       })
     '';
   };
