@@ -25,6 +25,7 @@
     nautilus
     gnome-disk-utility
     keepassxc
+    heroic
 
     # Social
     vesktop
