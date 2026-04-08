@@ -9,6 +9,8 @@
 
     extraPackages = with pkgs; [
       rust-analyzer
+      rustc
+      cargo
       nixd
       bash-language-server
       yaml-language-server
