@@ -33,7 +33,7 @@
       ];
 
       "$mod" = "SUPER";
-      "$terminal" = "foot";
+      "$terminal" = "ghostty";
       "$fileManager" = "nautilus --new-window";
       "$menu" = "evie search";
       "$menuAlt" = "wofi --show drun";

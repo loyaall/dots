@@ -16,7 +16,7 @@
     ../modules/home/zsh.nix
     ../modules/home/env.nix
     ../modules/home/services.nix
-    ../modules/home/foot.nix
+    ../modules/home/ghostty.nix
     ../modules/home/gtk.nix
     ../modules/home/neovim.nix
   ];
